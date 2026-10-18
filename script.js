@@ -11,6 +11,19 @@ function addMessage(text, who) {
   bubble.scrollIntoView({ behavior: "smooth" });
 }
 
+function speak(text) {
+    return new Promise((resolve, reject) => {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "en-US";
+        utterance.voice = speechSynthesis.getVoices().find(voice => voice.name === "Google US English") || null;
+        utterance.onend = resolve;
+        utterance.onerror = reject;
+        utterance.rate = 1.0
+        utterance.pitch = 1.0
+        window.speechSynthesis.speak(utterance);
+    })
+}
+
 function sendMessage() {
   const text = textInput.value.trim();
   if (!text) return; // empty message? do nothing
@@ -38,6 +51,7 @@ async function showReply(userText) {
     }
 
     addMessage(data.reply, "system");
+    await speak(data.reply);
   } catch (err) {
     loadingEl.style.display = "none";
     addMessage("Couldn't reach the server. Is it running?", "system");
