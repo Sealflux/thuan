@@ -11,17 +11,28 @@ function addMessage(text, who) {
   bubble.scrollIntoView({ behavior: "smooth" });
 }
 
-function speak(text) {
-    return new Promise((resolve, reject) => {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = "en-US";
-        utterance.voice = speechSynthesis.getVoices().find(voice => voice.name === "Google US English") || null;
-        utterance.onend = resolve;
-        utterance.onerror = reject;
-        utterance.rate = 1.0
-        utterance.pitch = 1.0
-        window.speechSynthesis.speak(utterance);
-    })
+async function speak(text) {
+  const response = await fetch("http://localhost:8000/speak", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text }),
+  });
+
+  if (!response.ok) {
+    console.error("TTS failed:", await response.text());
+    return;
+  }
+
+  const audioBlob = await response.blob();
+  const audioUrl = URL.createObjectURL(audioBlob);
+  const audio = new Audio(audioUrl);
+
+  await new Promise((resolve) => {
+    audio.onended = resolve;
+    audio.play();
+  });
+
+  URL.revokeObjectURL(audioUrl);
 }
 
 function sendMessage() {
