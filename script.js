@@ -16,16 +16,33 @@ function sendMessage() {
   if (!text) return; // empty message? do nothing
   addMessage(text, "user");
   textInput.value = ""; // clear the input
-  showReply();
+  showReply(text);
 }
 
-function showReply() {
+async function showReply(userText) {
   loadingEl.style.display = "block";
 
-  setTimeout(() => {
+  try {
+    const response = await fetch("http://localhost:8000/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: userText }),
+    });
+
+    const data = await response.json();
     loadingEl.style.display = "none";
-    addMessage("I heard you. (AI coming soon.)", "system");
-  }, 1200); // 1200ms = 1.2 seconds
+
+    if (data.error) {
+      addMessage("Error: " + data.error, "system");
+      return;
+    }
+
+    addMessage(data.reply, "system");
+  } catch (err) {
+    loadingEl.style.display = "none";
+    addMessage("Couldn't reach the server. Is it running?", "system");
+    console.error(err);
+  }
 }
 
 sendButton.addEventListener("click", sendMessage);
