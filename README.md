@@ -17,7 +17,7 @@ You can absolutely clone this repo and make your own version. You'll need:
 - **Groq API key** (free) — for the brain — https://console.groq.com
 - **Fish Audio API key** (free tier) — for the voice — https://fish.audio
 
-Both have free tiers that are plenty for a personal project.
+Both have free tiers that are enough for personal projects(Please don't spend money for no reason!)
 
 ## Setup
 
